@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 3.3 - คำนวณค่าไฟฟ้า</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap');
+
+  :root{
+    --dark: #131921;
+    --dark-2: #232F3E;
+    --dark-3: #37475A;
+    --orange: #FF9900;
+    --orange-dark: #E88300;
+    --price: #B12704;
+    --link: #007185;
+    --green: #007600;
+    --bg: #EAEDED;
+    --card: #FFFFFF;
+    --border: #D5D9D9;
+    --ink: #0F1111;
+    --ink-soft: #565959;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    font-family:'Sarabun', Arial, sans-serif;
+    background:var(--bg);
+    margin:0;
+    color:var(--ink);
+  }
+
+  /* ---- top nav bar ---- */
+  .navbar{
+    background:var(--dark);
+    color:#fff;
+    padding:10px 16px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+
+  .brand{
+    font-weight:700;
+    font-size:19px;
+    display:flex;
+    align-items:baseline;
+    gap:2px;
+    white-space:nowrap;
+  }
+  .brand .dot{ color:var(--orange); }
+
+  .deliver{
+    font-size:11.5px;
+    color:#CCC;
+    display:flex;
+    flex-direction:column;
+    line-height:1.2;
+    white-space:nowrap;
+  }
+  .deliver b{ color:#fff; font-size:12.5px; }
+
+  .search{
+    flex:1;
+    display:flex;
+    border-radius:4px;
+    overflow:hidden;
+    min-width:0;
+  }
+  .search select{
+    background:#F3F3F3;
+    border:none;
+    padding:0 8px;
+    font-size:12px;
+    color:#555;
+  }
+  .search input{
+    flex:1;
+    border:none;
+    padding:8px 10px;
+    font-size:14px;
+    min-width:0;
+  }
+  .search button{
+    background:var(--orange);
+    border:none;
+    padding:0 14px;
+    cursor:pointer;
+    font-size:16px;
+  }
+
+  .navicons{
+    display:flex;
+    gap:16px;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  .navicons .cart{ display:flex; align-items:center; gap:4px; }
+  .navicons .cart .count{
+    background:var(--orange);
+    color:var(--dark);
+    font-weight:700;
+    border-radius:50%;
+    width:16px; height:16px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:10px;
+  }
+
+  .subnav{
+    background:var(--dark-2);
+    color:#fff;
+    font-size:12.5px;
+    padding:7px 16px;
+    display:flex;
+    gap:16px;
+    overflow-x:auto;
+  }
+  .subnav span{ white-space:nowrap; cursor:default; opacity:.9; }
+  .subnav span:hover{ opacity:1; text-decoration:underline; }
+
+  .breadcrumb{
+    max-width:900px;
+    margin:14px auto 0;
+    padding:0 16px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+  .breadcrumb a{ color:var(--link); text-decoration:none; }
+
+  /* ---- main layout ---- */
+  .wrap{
+    max-width:900px;
+    margin:0 auto;
+    padding:14px 16px 40px;
+    display:grid;
+    grid-template-columns:1.5fr 1fr;
+    gap:18px;
+  }
+
+  @media (max-width:720px){
+    .wrap{ grid-template-columns:1fr; }
+    .deliver, .search select{ display:none; }
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:20px;
+  }
+
+  h1{
+    font-size:19px;
+    font-weight:600;
+    margin:0 0 4px;
+    color:var(--ink);
+  }
+
+  .rating{
+    font-size:12.5px;
+    color:var(--link);
+    margin-bottom:14px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .stars{ color:var(--orange); letter-spacing:1px; }
+
+  .field{ margin-top:14px; }
+  .field:first-of-type{ margin-top:0; }
+
+  label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:5px;
+    color:var(--ink);
+  }
+
+  input[type=number]{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid #888C8C;
+    border-radius:8px;
+    font-size:14px;
+    font-family:'Sarabun', Arial, sans-serif;
+    background:#fff;
+  }
+
+  input[type=number]:focus{
+    outline:none;
+    border-color:var(--orange);
+    box-shadow:0 0 0 3px rgba(255,153,0,.28);
+  }
+
+  .buybox{
+    align-self:start;
+    position:sticky;
+    top:14px;
+  }
+
+  .price-row{
+    display:flex;
+    align-items:baseline;
+    gap:4px;
+    margin-bottom:6px;
+  }
+  .price-row .sym{ font-size:14px; color:var(--price); }
+  .price-row .amt{ font-size:26px; font-weight:600; color:var(--price); }
+
+  .instock{
+    color:var(--green);
+    font-size:16px;
+    font-weight:600;
+    margin:8px 0 14px;
+  }
+
+  button{
+    width:100%;
+    padding:10px 12px;
+    background:linear-gradient(180deg, #FFD814, #F7CA00);
+    border:1px solid #A88734;
+    border-radius:20px;
+    font-size:14px;
+    font-weight:500;
+    color:var(--ink);
+    cursor:pointer;
+    font-family:'Sarabun', Arial, sans-serif;
+  }
+  button:hover{ background:linear-gradient(180deg, #F7CA00, #F2C200); }
+  button:active{ box-shadow:inset 0 0 0 1px rgba(0,0,0,.15); }
+
+  .secure{
+    margin-top:12px;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+
+  #result{ margin-top:0; }
+
+  .error-msg{
+    margin-top:16px;
+    background:#FEF0F0;
+    border:1px solid #F5C6C6;
+    color:var(--price);
+    padding:12px 14px;
+    border-radius:6px;
+    font-size:13.5px;
+    font-weight:600;
+  }
+
+  .order-card{
+    margin-top:16px;
+    border-top:3px solid var(--orange);
+    padding-top:14px;
+  }
+
+  .order-card h4{
+    font-size:15px;
+    margin:0 0 12px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .order-card h4::before{
+    content:"✓";
+    background:var(--green);
+    color:#fff;
+    width:18px; height:18px;
+    border-radius:50%;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+  }
+
+  .line{
+    display:flex;
+    justify-content:space-between;
+    font-size:13.5px;
+    padding:7px 0;
+    border-bottom:1px dashed var(--border);
+  }
+  .line span:first-child{ color:var(--ink-soft); }
+  .line span:last-child{ font-weight:500; }
+
+  .line.total{
+    border-bottom:none;
+    border-top:2px solid var(--ink);
+    margin-top:4px;
+    padding-top:10px;
+    font-size:16px;
+  }
+  .line.total span:first-child{ color:var(--ink); font-weight:700; }
+  .line.total span:last-child{ color:var(--price); font-weight:700; font-size:19px; }
+
+  .tag{
+    display:inline-block;
+    background:#F0F2F2;
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:4px 8px;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-top:10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <div class="brand">คำนวณ<span class="dot">ดี</span>.co</div>
+  <div class="deliver">ส่งถึง<br><b>คุณ | บ้านของคุณ</b></div>
+  <div class="search">
+    <select><option>ทั้งหมด</option></select>
+    <input type="text" placeholder="ค้นหาเครื่องมือคำนวณ...">
+    <button>🔍</button>
+  </div>
+  <div class="navicons">
+    <span>บัญชี &<br>รายการสั่งซื้อ</span>
+    <span class="cart">🛒<span class="count">1</span></span>
+  </div>
+</div>
+<div class="subnav">
+  <span>☰ ทั้งหมด</span>
+  <span>คำนวณสินเชื่อบ้าน</span>
+  <span>คำนวณรถยนต์</span>
+  <span style="color:var(--orange); font-weight:600;">คำนวณค่าไฟฟ้า</span>
+  <span>ดีลวันนี้</span>
+</div>
+
+<div class="breadcrumb">
+  <a href="#">หน้าหลัก</a> › <a href="#">เครื่องมือคำนวณ</a> › ค่าไฟฟ้าภายในบ้าน
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <h1>Lab 3.3: ฟอร์มคำนวณค่าไฟฟ้าภายในบ้าน</h1>
+    <div class="rating"><span class="stars">★★★★★</span> ใช้งานง่าย · แม่นยำตามอัตราก้าวหน้าการไฟฟ้า</div>
+
+    <div class="field">
+      <label>เลขมิเตอร์เดือนก่อนหน้า (หน่วย)</label>
+      <input type="number" id="prevUnit" placeholder="เช่น 1200">
+    </div>
+    <div class="field">
+      <label>เลขมิเตอร์เดือนปัจจุบัน (หน่วย)</label>
+      <input type="number" id="currentUnit" placeholder="เช่น 1350">
+    </div>
+
+    <span class="tag">รวม Ft และภาษีมูลค่าเพิ่ม 7% ให้อัตโนมัติ</span>
+  </div>
+
+  <div class="card buybox">
+    <div class="price-row"><span class="sym">฿</span><span class="amt">ประเมินค่าไฟของคุณ</span></div>
+    <div class="instock">● พร้อมคำนวณทันที</div>
+
+    <button onclick="calculateElectricity()">⚡ คำนวณค่าไฟฟ้า</button>
+
+    <div class="secure">🔒 คำนวณฝั่งเบราว์เซอร์ ไม่มีการส่งข้อมูลออกไปไหน</div>
+
+    <div id="result"></div>
+  </div>
+</div>
+
+<script>
+function calculateElectricity() {
+  let prevUnit = parseFloat(document.getElementById("prevUnit").value);
+  let currentUnit = parseFloat(document.getElementById("currentUnit").value);
+
+  if ([prevUnit, currentUnit].some(isNaN) || currentUnit < prevUnit) {
+    document.getElementById("result").innerHTML =
+      `<div class="error-msg">⚠ กรุณากรอกเลขมิเตอร์ให้ถูกต้อง (ปัจจุบันต้องมากกว่าหรือเท่ากับก่อนหน้า)</div>`;
+    return;
+  }
+
+  let usedUnit = currentUnit - prevUnit;
+  let ftRate = 0.65; // บาท / หน่วย (ตัวอย่าง)
+  let energyCost = 0;
+
+  // คำนวณค่าพลังงานตามอัตราก้าวหน้า
+  if (usedUnit <= 150) {
+    energyCost = usedUnit * 3.25;
+  } else if (usedUnit <= 400) {
+    energyCost = 150 * 3.25 + (usedUnit - 150) * 4.22;
+  } else {
+    energyCost = 150 * 3.25 + 250 * 4.22 + (usedUnit - 400) * 4.42;
+  }
+
+  let ftCost = usedUnit * ftRate;
+  let totalBeforeVat = energyCost + ftCost;
+  let vat = totalBeforeVat * 0.07;
+  let total = totalBeforeVat + vat;
+
+  document.getElementById("result").innerHTML = `
+    <div class="order-card">
+      <h4>สรุปค่าไฟฟ้า</h4>
+      <div class="line"><span>หน่วยที่ใช้</span><span>${usedUnit} หน่วย</span></div>
+      <div class="line"><span>ค่าพลังงานไฟฟ้า</span><span>${energyCost.toFixed(2)} บาท</span></div>
+      <div class="line"><span>ค่า Ft (${ftRate} บาท/หน่วย)</span><span>${ftCost.toFixed(2)} บาท</span></div>
+      <div class="line"><span>รวมก่อนภาษี</span><span>${totalBeforeVat.toFixed(2)} บาท</span></div>
+      <div class="line"><span>ภาษีมูลค่าเพิ่ม 7%</span><span>${vat.toFixed(2)} บาท</span></div>
+      <div class="line total"><span>รวมทั้งสิ้น</span><span>${total.toFixed(2)} บาท</span></div>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>

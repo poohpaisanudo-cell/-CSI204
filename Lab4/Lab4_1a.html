@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lab 4.1a - บันทึกข้อมูลส่วนตัว</title>
+<style>
+  *{margin:0; padding:0; box-sizing:border-box;}
+  body{
+    font-family:'Sarabun',sans-serif; 
+    background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding:20px;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .box{
+    max-width:480px; 
+    width:100%;
+    background:#fff; 
+    padding:40px; 
+    border-radius:16px; 
+    box-shadow:0 20px 60px rgba(0,0,0,0.3);
+    animation: slideUp 0.5s ease-out;
+  }
+  @keyframes slideUp{
+    from{transform:translateY(20px); opacity:0;}
+    to{transform:translateY(0); opacity:1;}
+  }
+  h1{
+    font-size:26px; 
+    color:#2f4c8f;
+    margin-bottom:32px;
+    font-weight:600;
+  }
+  label{
+    display:block; 
+    margin-top:16px; 
+    font-size:14px;
+    color:#333;
+    font-weight:500;
+  }
+  input, select{
+    width:100%; 
+    padding:12px 16px; 
+    margin-top:8px; 
+    border:2px solid #e0e0e0; 
+    border-radius:8px;
+    font-size:14px;
+    font-family:'Sarabun',sans-serif;
+    transition:all 0.3s ease;
+  }
+  input:focus, select:focus{
+    outline:none;
+    border-color:#667eea;
+    box-shadow:0 0 0 4px rgba(102, 126, 234, 0.1);
+    transform:translateY(-2px);
+  }
+  input:hover, select:hover{
+    border-color:#667eea;
+  }
+  button{
+    margin-top:28px; 
+    width:100%;
+    padding:14px 24px; 
+    background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color:#fff; 
+    border:none; 
+    border-radius:8px; 
+    cursor:pointer;
+    font-size:16px;
+    font-weight:600;
+    font-family:'Sarabun',sans-serif;
+    transition:all 0.3s ease;
+    box-shadow:0 8px 20px rgba(102, 126, 234, 0.3);
+  }
+  button:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 30px rgba(102, 126, 234, 0.4);
+  }
+  button:active{
+    transform:translateY(-1px);
+  }
+  a{
+    display:inline-block; 
+    margin-top:20px; 
+    color:#667eea;
+    text-decoration:none;
+    font-weight:500;
+    transition:all 0.3s ease;
+  }
+  a:hover{
+    color:#764ba2;
+    margin-left:4px;
+  }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Lab 4.1a: ฟอร์มเก็บข้อมูลส่วนตัว</h1>
+  <form onsubmit="return saveProfile(event)">
+    <label>ชื่อ</label>
+    <input type="text" id="name" required>
+    <label>อีเมล</label>
+    <input type="email" id="email" required>
+    <label>เบอร์โทร</label>
+    <input type="text" id="phone" required>
+    <label>ธีมที่ชื่นชอบ</label>
+    <select id="theme">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+      <option value="blue">Blue</option>
+    </select>
+    <button type="submit">บันทึกข้อมูล</button>
+  </form>
+  <a href="lab4_1b.html">ไปหน้าแสดงข้อมูล →</a>
+</div>
+
+<script>
+function saveProfile(e) {
+  e.preventDefault();
+  const profile = {
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
+    theme: document.getElementById("theme").value
+  };
+  localStorage.setItem("profile", JSON.stringify(profile));
+  alert("บันทึกข้อมูลเรียบร้อย! ไปที่หน้าแสดงข้อมูลเพื่อดูผลลัพธ์");
+  return false;
+}
+</script>
+</body>
+</html>

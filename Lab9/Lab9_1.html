@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lab 9 - ระบบคำนวณสินเชื่อบ้านแบบลดต้นลดดอก</title>
+<style>
+  *{margin:0; padding:0; box-sizing:border-box;}
+  body{
+    font-family:'Sarabun','Segoe UI',sans-serif; 
+    background:linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    padding:20px;
+    min-height:100vh;
+  }
+  .box{
+    max-width:800px; 
+    margin:auto; 
+    background:rgba(255,255,255,0.95);
+    backdrop-filter:blur(10px);
+    padding:44px; 
+    border-radius:24px; 
+    box-shadow:0 25px 50px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1);
+    border:1px solid rgba(255,255,255,0.8);
+  }
+  h1{
+    font-size:32px; 
+    color:#1a1a2e;
+    margin-bottom:8px;
+    font-weight:800;
+    letter-spacing:-0.5px;
+    background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  p.sub{
+    color:#999; 
+    font-size:14px; 
+    margin-top:4px;
+    font-weight:500;
+  }
+  .grid{
+    display:grid; 
+    grid-template-columns:1fr 1fr; 
+    gap:18px; 
+    margin-top:24px;
+  }
+  label{
+    display:block; 
+    font-size:13px; 
+    margin-bottom:8px; 
+    color:#2c3e50;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  input, select{
+    width:100%; 
+    padding:12px 16px; 
+    border:2px solid #e8eef7;
+    border-radius:12px; 
+    font-size:14px;
+    font-family:inherit;
+    background:#f8fafb;
+    color:#1a1a2e;
+    transition:all 0.3s ease;
+  }
+  input::placeholder{
+    color:#bbb;
+  }
+  input:focus, select:focus{
+    outline:none;
+    border-color:#667eea;
+    background:#fff;
+    box-shadow:0 0 0 4px rgba(102,126,234,0.1);
+    transform:translateY(-2px);
+  }
+  input:hover, select:hover{
+    border-color:#667eea;
+    background:#fff;
+  }
+  button{
+    margin-top:28px; 
+    width:100%;
+    padding:16px 24px; 
+    background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color:#fff; 
+    border:none; 
+    border-radius:12px; 
+    font-size:15px;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+    transition:all 0.3s ease;
+    box-shadow:0 10px 30px rgba(102,126,234,0.3);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  button:hover{
+    transform:translateY(-3px);
+    box-shadow:0 15px 40px rgba(102,126,234,0.4);
+  }
+  button:active{
+    transform:translateY(-1px);
+  }
+  .error{
+    color:#ff6b6b; 
+    margin-top:14px; 
+    font-size:14px;
+    font-weight:600;
+    background:#ffe0e0;
+    padding:12px 16px;
+    border-radius:8px;
+    border-left:4px solid #ff6b6b;
+  }
+  .summary{
+    margin-top:28px; 
+    display:grid; 
+    grid-template-columns:1fr 1fr; 
+    gap:16px;
+  }
+  .card{
+    background:linear-gradient(135deg, #f8fafc 0%, #f0f4f9 100%);
+    border:1px solid #e8eef7;
+    border-radius:14px; 
+    padding:20px; 
+    text-align:center;
+    transition:all 0.3s ease;
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 12px 30px rgba(102,126,234,0.15);
+    border-color:#667eea;
+  }
+  .card .label{
+    font-size:13px; 
+    color:#666;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+  }
+  .card .value{
+    font-size:18px; 
+    font-weight:800; 
+    color:#667eea; 
+    margin-top:8px;
+  }
+  table{
+    width:100%; 
+    border-collapse:collapse; 
+    margin-top:24px; 
+    font-size:13px;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 4px 12px rgba(0,0,0,0.05);
+  }
+  thead tr{
+    background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  th{
+    color:#fff;
+    padding:14px; 
+    text-align:right;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+    font-size:12px;
+  }
+  td{
+    border-bottom:1px solid #e8eef7;
+    padding:12px 14px; 
+    text-align:right;
+    color:#2c3e50;
+    background:#fff;
+    font-weight:500;
+  }
+  tbody tr:hover{
+    background:#f8fafc;
+  }
+  tbody tr:last-child td{
+    border-bottom:none;
+  }
+  h2{
+    font-size:18px; 
+    color:#1a1a2e; 
+    margin-top:32px;
+    font-weight:700;
+    letter-spacing:-0.3px;
+  }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>🏠 ระบบคำนวณสินเชื่อบ้านแบบลดต้นลดดอก</h1>
+  <p class="sub">Mortgage Calculator (Effective Rate) — CSI204 Lab#9</p>
+
+  <div class="grid">
+    <div>
+      <label>ราคาบ้าน (บาท)</label>
+      <input type="number" id="housePrice" value="3000000">
+    </div>
+    <div>
+      <label>เงินดาวน์ (บาท)</label>
+      <input type="number" id="downPayment" value="300000">
+    </div>
+    <div>
+      <label>อัตราดอกเบี้ย (% ต่อปี)</label>
+      <input type="number" id="interestRate" value="5" step="0.01">
+    </div>
+    <div>
+      <label>ระยะเวลาผ่อน</label>
+      <select id="years">
+        <option value="10">10 ปี</option>
+        <option value="20">20 ปี</option>
+        <option value="30" selected>30 ปี</option>
+      </select>
+    </div>
+  </div>
+
+  <button onclick="calculateMortgage()">คำนวณสินเชื่อ</button>
+  <div id="error" class="error"></div>
+
+  <div id="summarySection" style="display:none">
+    <div class="summary">
+      <div class="card"><div class="label">วงเงินกู้สุทธิ</div><div class="value" id="sLoan"></div></div>
+      <div class="card"><div class="label">จำนวนงวดทั้งหมด</div><div class="value" id="sMonths"></div></div>
+      <div class="card"><div class="label">ค่างวดต่อเดือน</div><div class="value" id="sPayment"></div></div>
+      <div class="card"><div class="label">ดอกเบี้ยรวมทั้งสัญญา</div><div class="value" id="sInterest"></div></div>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <div class="label">ยอดชำระรวมทั้งหมด</div>
+      <div class="value" id="sTotal" style="font-size:20px;"></div>
+    </div>
+
+    <h2>ตารางผ่อนชำระ (12 งวดแรก)</h2>
+    <table>
+      <thead><tr><th>งวด</th><th>เงินต้น</th><th>ดอกเบี้ย</th><th>ยอดชำระ</th><th>คงเหลือ</th></tr></thead>
+      <tbody id="amortTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function formatTHB(num) {
+  return num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " บาท";
+}
+
+function calculateMortgage() {
+  const housePrice = parseFloat(document.getElementById("housePrice").value);
+  const downPayment = parseFloat(document.getElementById("downPayment").value);
+  const annualRate = parseFloat(document.getElementById("interestRate").value);
+  const years = parseInt(document.getElementById("years").value);
+
+  const errorBox = document.getElementById("error");
+  errorBox.innerText = "";
+
+  // Validation
+  if ([housePrice, downPayment, annualRate, years].some(v => isNaN(v))) {
+    errorBox.innerText = "กรุณากรอกข้อมูลให้ครบทุกช่อง";
+    document.getElementById("summarySection").style.display = "none";
+    return;
+  }
+  if (housePrice <= 0 || downPayment < 0 || downPayment >= housePrice) {
+    errorBox.innerText = "เงินดาวน์ต้องน้อยกว่าราคาบ้าน และราคาบ้านต้องมากกว่า 0";
+    document.getElementById("summarySection").style.display = "none";
+    return;
+  }
+  if (annualRate <= 0 || annualRate > 30) {
+    errorBox.innerText = "อัตราดอกเบี้ยไม่ถูกต้อง";
+    document.getElementById("summarySection").style.display = "none";
+    return;
+  }
+
+  // คำนวณวงเงินกู้และจำนวนงวด
+  const loanAmount = housePrice - downPayment;
+  const months = years * 12;
+  const monthlyRate = annualRate / 100 / 12;
+
+  // ค่างวดรายเดือนแบบลดต้นลดดอก (Effective Rate / PMT formula)
+  const monthlyPayment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+                          (Math.pow(1 + monthlyRate, months) - 1);
+
+  // สร้างตารางผ่อนชำระทั้งหมด เพื่อคำนวณดอกเบี้ยรวมที่ถูกต้อง
+  let remaining = loanAmount;
+  let totalInterest = 0;
+  let amortRows = "";
+
+  for (let i = 1; i <= months; i++) {
+    const interest = remaining * monthlyRate;
+    const principal = monthlyPayment - interest;
+    remaining -= principal;
+    totalInterest += interest;
+
+    if (i <= 12) {
+      amortRows += `<tr>
+        <td>${i}</td>
+        <td>${principal.toFixed(2)}</td>
+        <td>${interest.toFixed(2)}</td>
+        <td>${monthlyPayment.toFixed(2)}</td>
+        <td>${Math.max(0, remaining).toFixed(2)}</td>
+      </tr>`;
+    }
+  }
+
+  const totalPaid = monthlyPayment * months;
+
+  // แสดงผลลัพธ์
+  document.getElementById("sLoan").innerText = formatTHB(loanAmount);
+  document.getElementById("sMonths").innerText = months + " งวด";
+  document.getElementById("sPayment").innerText = formatTHB(monthlyPayment);
+  document.getElementById("sInterest").innerText = formatTHB(totalInterest);
+  document.getElementById("sTotal").innerText = formatTHB(totalPaid);
+  document.getElementById("amortTable").innerHTML = amortRows;
+  document.getElementById("summarySection").style.display = "block";
+}
+
+// คำนวณครั้งแรกโดยอัตโนมัติด้วยค่าตัวอย่าง
+calculateMortgage();
+</script>
+</body>
+</html>

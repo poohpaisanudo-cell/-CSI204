@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lab 5.1 - คำนวณราคาสินค้า (if-else + Checkbox)</title>
+<style>
+  *{margin:0; padding:0; box-sizing:border-box;}
+  body{
+    font-family:'Sarabun',sans-serif; 
+    background:linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding:20px;
+    min-height:100vh;
+  }
+  .box{
+    max-width:900px; 
+    margin:auto;
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(10px);
+    padding:40px; 
+    border-radius:20px; 
+    box-shadow:0 8px 32px rgba(0,0,0,0.3);
+    border:1px solid rgba(255,255,255,0.1);
+  }
+  h1{
+    font-size:32px; 
+    background:linear-gradient(135deg, #00d4ff, #ff00ff, #ffff00);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    margin-bottom:30px;
+    font-weight:700;
+  }
+  #productList{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+    gap:20px;
+    margin-bottom:30px;
+  }
+  .item{
+    display:flex; 
+    align-items:center; 
+    gap:12px; 
+    padding:18px;
+    background:rgba(255,255,255,0.08);
+    border:2px solid rgba(0,212,255,0.3);
+    border-radius:12px;
+    transition:all 0.3s ease;
+    cursor:pointer;
+  }
+  .item:hover{
+    background:rgba(0,212,255,0.15);
+    transform:scale(1.05);
+    box-shadow:0 0 20px rgba(0,212,255,0.4);
+  }
+  input[type="checkbox"]{
+    width:20px;
+    height:20px;
+    cursor:pointer;
+    accent-color:#00d4ff;
+  }
+  label{
+    color:#fff;
+    font-size:15px;
+    cursor:pointer;
+  }
+  button{
+    margin-top:20px;
+    width:100%;
+    padding:16px 24px; 
+    background:linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+    color:#000; 
+    border:none; 
+    border-radius:10px; 
+    cursor:pointer;
+    font-size:16px;
+    font-weight:700;
+    font-family:'Sarabun',sans-serif;
+    transition:all 0.3s ease;
+    box-shadow:0 0 20px rgba(0,212,255,0.4);
+  }
+  button:hover{
+    transform:translateY(-3px);
+    box-shadow:0 0 30px rgba(0,212,255,0.6);
+  }
+  button:active{
+    transform:translateY(-1px);
+  }
+  #result{
+    margin-top:30px; 
+    background:rgba(0,212,255,0.1);
+    border:2px solid rgba(0,212,255,0.4);
+    padding:24px; 
+    border-radius:12px; 
+    font-size:16px;
+    color:#fff;
+    line-height:1.8;
+    box-shadow:inset 0 0 20px rgba(0,212,255,0.1);
+  }
+  #result p{
+    margin:10px 0;
+  }
+  #result strong{
+    color:#ffff00;
+    font-size:18px;
+  }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Lab 5.1: ระบบคำนวณราคาสินค้า</h1>
+  <div id="productList"></div>
+  <button onclick="calculateTotal()">คำนวณราคารวม</button>
+  <div id="result"></div>
+</div>
+
+<script>
+const products = [
+  { id: 1, name: "หูฟังไร้สาย", price: 590 },
+  { id: 2, name: "เมาส์ไร้สาย", price: 320 },
+  { id: 3, name: "คีย์บอร์ด", price: 750 },
+  { id: 4, name: "แบตสำรอง", price: 480 },
+  { id: 5, name: "กระเป๋าโน้ตบุ๊ก", price: 690 },
+];
+
+function renderProducts() {
+  document.getElementById("productList").innerHTML = products.map(p =>
+    `<div class="item">
+      <input type="checkbox" id="p${p.id}" value="${p.price}">
+      <label for="p${p.id}">${p.name} — ${p.price} บาท</label>
+    </div>`
+  ).join("");
+}
+
+function calculateTotal() {
+  let total = 0;
+  products.forEach(p => {
+    const checkbox = document.getElementById(`p${p.id}`);
+    if (checkbox.checked) total += p.price;
+  });
+
+  let discount = 0;
+  if (total > 1000) {
+    discount = total * 0.15;
+  } else if (total > 500) {
+    discount = total * 0.10;
+  }
+
+  const finalPrice = total - discount;
+
+  document.getElementById("result").innerHTML = `
+    <p>ราคารวมก่อนส่วนลด: ${total.toFixed(2)} บาท</p>
+    <p>ส่วนลด: ${discount.toFixed(2)} บาท</p>
+    <p><strong>ราคาสุทธิ: ${finalPrice.toFixed(2)} บาท</strong></p>
+  `;
+}
+
+renderProducts();
+</script>
+</body>
+</html>

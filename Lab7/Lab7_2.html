@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lab 7.2 - JSON Import/Export</title>
+<style>
+  *{margin:0; padding:0; box-sizing:border-box;}
+  body{
+    font-family:'Sarabun',sans-serif; 
+    background:linear-gradient(135deg, #1a472a 0%, #0d5f2e 50%, #0a3d1f 100%);
+    padding:20px;
+    min-height:100vh;
+  }
+  .box{
+    max-width:680px; 
+    margin:auto; 
+    background:#fff;
+    padding:32px; 
+    border-radius:12px; 
+    box-shadow:0 20px 60px rgba(0,0,0,0.3), 0 0 40px rgba(255,255,255,0.1);
+    border:4px solid #000;
+  }
+  h1{
+    font-size:28px; 
+    color:#000;
+    margin-bottom:28px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    text-align:center;
+    background:linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  table{
+    width:100%; 
+    border-collapse:collapse; 
+    font-size:14px; 
+    margin-top:16px;
+    border:3px solid #000;
+  }
+  thead tr{
+    background:linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+  }
+  th{
+    color:#ffd700;
+    padding:14px; 
+    text-align:center;
+    font-weight:900;
+    border:2px solid #ffd700;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-size:12px;
+  }
+  td{
+    border:2px solid #ddd;
+    padding:12px; 
+    text-align:center;
+    color:#000;
+    font-weight:600;
+    background:#f9f9f9;
+  }
+  tbody tr:nth-child(odd) td{
+    background:#e8f5e9;
+  }
+  tbody tr:hover td{
+    background:#c8e6c9;
+    transform:scale(1.02);
+    transition:all 0.3s ease;
+  }
+  button{
+    margin:12px 6px 0 0; 
+    padding:12px 18px; 
+    background:linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+    color:#ffd700; 
+    border:2px solid #ffd700;
+    border-radius:6px; 
+    cursor:pointer;
+    font-weight:700;
+    font-family:'Sarabun',sans-serif;
+    font-size:14px;
+    transition:all 0.3s ease;
+    text-transform:uppercase;
+  }
+  button:hover{
+    background:#ffd700;
+    color:#000;
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(0,0,0,0.3);
+  }
+  #summary{
+    margin-top:20px; 
+    background:linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border:3px solid #1a472a;
+    padding:18px; 
+    border-radius:8px; 
+    font-size:14px;
+    font-weight:600;
+    color:#0d5f2e;
+    line-height:1.8;
+  }
+  #summary p{
+    margin:8px 0;
+  }
+  label{
+    display:block;
+    margin-top:16px;
+    font-size:14px;
+    font-weight:600;
+    color:#000;
+  }
+  input[type=file]{
+    margin-top:8px;
+    padding:8px;
+    border:2px solid #1a472a;
+    border-radius:4px;
+  }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Lab 7.2: ระบบนำเข้า/ส่งออกข้อมูล (JSON)</h1>
+  <table>
+    <thead><tr><th>ID</th><th>สินค้า</th><th>ราคา</th></tr></thead>
+    <tbody id="productTable"></tbody>
+  </table>
+  <div id="summary"></div>
+  <button onclick="exportJSON()">ส่งออก (Export) JSON</button>
+  <br>
+  <label>นำเข้า (Import) ไฟล์ JSON:</label><br>
+  <input type="file" id="fileInput" accept=".json" onchange="importJSON(event)">
+</div>
+
+<script>
+let products = [
+  { id: 1, name: "นาฬิกา", price: 3000 },
+  { id: 2, name: "กระเป๋า", price: 1200 },
+  { id: 3, name: "รองเท้า", price: 890 },
+];
+
+function render() {
+  // forEach() - แสดงข้อมูล
+  let rows = "";
+  products.forEach(p => {
+    rows += `<tr><td>${p.id}</td><td>${p.name}</td><td>${p.price}</td></tr>`;
+  });
+  document.getElementById("productTable").innerHTML = rows;
+
+  // map() - แปลงข้อมูลเป็น array ชื่อสินค้า
+  const names = products.map(p => p.name);
+
+  // filter() - กรองสินค้าราคามากกว่า 1000
+  const expensive = products.filter(p => p.price > 1000);
+
+  // reduce() - สรุปราคารวม
+  const total = products.reduce((sum, item) => sum + item.price, 0);
+
+  document.getElementById("summary").innerHTML = `
+    <p><b>รายชื่อสินค้า (map):</b> ${names.join(", ")}</p>
+    <p><b>สินค้าราคา > 1000 (filter):</b> ${expensive.map(p=>p.name).join(", ") || "ไม่มี"}</p>
+    <p><b>ราคารวมทั้งหมด (reduce):</b> ${total.toLocaleString()} บาท</p>
+  `;
+}
+
+function exportJSON() {
+  const jsonStr = JSON.stringify(products, null, 2); // Object -> JSON string
+  const blob = new Blob([jsonStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "products.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const imported = JSON.parse(e.target.result); // JSON string -> Object
+      products = imported;
+      render();
+      alert("นำเข้าข้อมูลสำเร็จ!");
+    } catch (err) {
+      alert("ไฟล์ JSON ไม่ถูกต้อง");
+    }
+  };
+  reader.readAsText(file);
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lab 4.1b - แสดงข้อมูลที่บันทึกไว้</title>
+<style>
+  *{margin:0; padding:0; box-sizing:border-box;}
+  body{
+    font-family:'Sarabun',sans-serif; 
+    padding:20px;
+    transition: background 0.5s ease, color 0.5s ease;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  body.light{
+    background:linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color:#222;
+  }
+  body.dark{
+    background:linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color:#eee;
+  }
+  body.blue{
+    background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color:#fff;
+  }
+  .box{
+    max-width:480px; 
+    width:100%;
+    backdrop-filter:blur(10px);
+    background:rgba(255,255,255,0.92);
+    color:#222; 
+    padding:40px; 
+    border-radius:16px; 
+    box-shadow:0 20px 60px rgba(0,0,0,0.2);
+    animation: slideIn 0.5s ease-out;
+    border:1px solid rgba(255,255,255,0.3);
+  }
+  body.dark .box{
+    background:rgba(30,30,46,0.95);
+    color:#eee;
+    border:1px solid rgba(255,255,255,0.1);
+  }
+  body.blue .box{
+    background:rgba(255,255,255,0.15);
+    color:#fff;
+    border:1px solid rgba(255,255,255,0.3);
+  }
+  @keyframes slideIn{
+    from{transform:scale(0.95); opacity:0;}
+    to{transform:scale(1); opacity:1;}
+  }
+  h1{
+    font-size:26px; 
+    color:#2f4c8f;
+    margin-bottom:28px;
+    font-weight:600;
+  }
+  body.dark h1{color:#a0c8ff;}
+  body.blue h1{color:#fff;}
+  #profileInfo{
+    background:rgba(255,255,255,0.5);
+    padding:24px;
+    border-radius:12px;
+    margin-bottom:24px;
+    line-height:1.8;
+    font-size:16px;
+  }
+  body.dark #profileInfo{
+    background:rgba(255,255,255,0.08);
+  }
+  body.blue #profileInfo{
+    background:rgba(255,255,255,0.15);
+  }
+  p{margin:12px 0;}
+  button{
+    padding:12px 20px; 
+    border:none; 
+    border-radius:8px; 
+    cursor:pointer; 
+    background:#667eea;
+    color:#fff;
+    font-size:14px;
+    font-weight:600;
+    font-family:'Sarabun',sans-serif;
+    transition:all 0.3s ease;
+    margin-right:12px;
+    margin-top:16px;
+    box-shadow:0 8px 20px rgba(102, 126, 234, 0.3);
+  }
+  button:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 30px rgba(102, 126, 234, 0.4);
+  }
+  button:active{
+    transform:translateY(-1px);
+  }
+  button.danger{
+    background:#ff6b6b;
+    box-shadow:0 8px 20px rgba(255, 107, 107, 0.3);
+  }
+  button.danger:hover{
+    box-shadow:0 12px 30px rgba(255, 107, 107, 0.4);
+  }
+  a{
+    display:inline-block; 
+    margin-top:20px; 
+    color:#667eea;
+    text-decoration:none;
+    font-weight:500;
+    transition:all 0.3s ease;
+  }
+  body.dark a{color:#a0c8ff;}
+  body.blue a{color:#fff;}
+  a:hover{
+    margin-left:4px;
+  }
+</style>
+</head>
+<body class="light">
+<div class="box">
+  <h1>Lab 4.1b: ข้อมูลที่บันทึกไว้</h1>
+  <div id="profileInfo">ยังไม่มีข้อมูล</div>
+  <button onclick="cycleTheme()">เปลี่ยน Theme</button>
+  <button class="danger" onclick="clearProfile()">ล้างข้อมูล</button>
+  <br><a href="lab4_1a.html">← กลับไปหน้าฟอร์ม</a>
+</div>
+
+<script>
+function loadProfile() {
+  const data = JSON.parse(localStorage.getItem("profile"));
+  if (!data) {
+    document.getElementById("profileInfo").innerText = "ยังไม่มีข้อมูล กรุณากรอกฟอร์มก่อน";
+    return;
+  }
+  document.getElementById("profileInfo").innerHTML = `
+    <p><b>ชื่อ:</b> ${data.name}</p>
+    <p><b>อีเมล:</b> ${data.email}</p>
+    <p><b>เบอร์โทร:</b> ${data.phone}</p>
+    <p><b>ธีม:</b> ${data.theme}</p>
+  `;
+  document.body.className = data.theme;
+}
+
+function cycleTheme() {
+  const themes = ["light", "dark", "blue"];
+  const current = themes.indexOf(document.body.className);
+  const next = themes[(current + 1) % themes.length];
+  document.body.className = next;
+  const data = JSON.parse(localStorage.getItem("profile")) || {};
+  data.theme = next;
+  localStorage.setItem("profile", JSON.stringify(data));
+}
+
+function clearProfile() {
+  localStorage.removeItem("profile");
+  document.body.className = "light";
+  loadProfile();
+}
+
+loadProfile();
+</script>
+</body>
+</html>
